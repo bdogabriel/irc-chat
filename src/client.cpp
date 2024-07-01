@@ -6,6 +6,8 @@
 
 #define PORT 6667
 
+using namespace std;
+
 void receive_messages(int client_socket)
 {
     char buffer[1024];
@@ -14,12 +16,12 @@ void receive_messages(int client_socket)
         int bytes_received = recv(client_socket, buffer, 1024, 0);
         if (bytes_received <= 0)
         {
-            std::cerr << "Connection closed by server\n";
+            cerr << "Connection closed by server\n";
             close(client_socket);
             exit(1);
         }
         buffer[bytes_received] = '\0';
-        std::cout << "Server: " << buffer << std::endl;
+        cout << buffer << endl;
     }
 }
 
@@ -28,7 +30,7 @@ int main()
     int client_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (client_socket == -1)
     {
-        std::cerr << "Socket creation failed\n";
+        cerr << "Socket creation failed\n";
         return 1;
     }
 
@@ -39,18 +41,18 @@ int main()
 
     if (connect(client_socket, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0)
     {
-        std::cerr << "Connection to server failed\n";
+        cerr << "Connection to server failed\n";
         return 1;
     }
 
-    std::cout << "Connected to server\n";
+    cout << "Connected to server\n";
 
-    std::thread(receive_messages, client_socket).detach();
+    thread(receive_messages, client_socket).detach();
 
     char message[1024];
     while (true)
     {
-        std::cin.getline(message, 1024);
+        cin.getline(message, 1024);
         send(client_socket, message, strlen(message), 0);
     }
 

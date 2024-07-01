@@ -8,5 +8,5 @@ server:
 client:
 	g++ src/client.cpp -o exe/client -pthread -Wall -Werror
 
-clear:
+clean:
 	rm exe/server exe/client
