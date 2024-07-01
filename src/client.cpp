@@ -8,6 +8,7 @@
 
 using namespace std;
 
+// Function to receive messages from the server
 void receive_messages(int client_socket)
 {
     char buffer[1024];
@@ -47,8 +48,10 @@ int main()
 
     cout << "Connected to server\n";
 
+    // Start a thread to receive messages from the server
     thread(receive_messages, client_socket).detach();
 
+    // Main loop to send messages to the server
     char message[1024];
     while (true)
     {

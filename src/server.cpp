@@ -16,6 +16,7 @@
 
 using namespace std;
 
+// Data structures to manage clients, channels, and admin privileges
 vector<int> clients;
 map<int, string> client_names;
 map<string, vector<int>> channels;
@@ -25,6 +26,7 @@ map<string, set<int>> muted_clients;
 set<int> admins;
 map<int, string> client_channels;
 
+// Function to broadcast messages to a specific channel
 void broadcast_message(const string &message, const string &channel, int exclude_fd = -1)
 {
     for (int client : channels[channel])
@@ -36,6 +38,7 @@ void broadcast_message(const string &message, const string &channel, int exclude
     }
 }
 
+// Function to handle each client
 void handle_client(int client_socket)
 {
     char buffer[1024];
@@ -51,6 +54,7 @@ void handle_client(int client_socket)
         int bytes_received = recv(client_socket, buffer, 1024, 0);
         if (bytes_received <= 0)
         {
+            // Client disconnected
             close(client_socket);
             clients.erase(remove(clients.begin(), clients.end(), client_socket), clients.end());
             if (!nickname.empty() && !current_channel.empty())
@@ -65,12 +69,14 @@ void handle_client(int client_socket)
 
         if (message[0] == '/')
         {
+            // Handle commands
             istringstream iss(message.substr(1));
             string command;
             iss >> command;
 
             if (command == "nick")
             {
+                // Set or change nickname
                 iss >> nickname;
                 client_names[client_socket] = nickname;
                 string confirm_message = "Nickname changed to " + nickname + "\n";
@@ -78,6 +84,7 @@ void handle_client(int client_socket)
             }
             else if (command == "join")
             {
+                // Join an existing channel
                 if (nickname.empty())
                 {
                     send(client_socket, "You must set a nickname before joining a channel.\n", 51, 0);
@@ -110,6 +117,7 @@ void handle_client(int client_socket)
             }
             else if (command == "mute")
             {
+                // Mute a user (admin only)
                 if (admins.find(client_socket) != admins.end())
                 {
                     string user_to_mute;
@@ -137,6 +145,7 @@ void handle_client(int client_socket)
             }
             else if (command == "unmute")
             {
+                // Unmute a user (admin only)
                 if (admins.find(client_socket) != admins.end())
                 {
                     string user_to_unmute;
@@ -164,6 +173,7 @@ void handle_client(int client_socket)
             }
             else if (command == "kick")
             {
+                // Kick a user (admin only)
                 if (admins.find(client_socket) != admins.end())
                 {
                     string user_to_kick;
@@ -193,6 +203,7 @@ void handle_client(int client_socket)
             }
             else if (command == "login")
             {
+                // Authenticate as admin
                 string password;
                 iss >> password;
                 if (password == ADMIN_PASSWORD)
@@ -207,6 +218,7 @@ void handle_client(int client_socket)
             }
             else if (command == "create")
             {
+                // Create a new channel (admin only)
                 if (admins.find(client_socket) != admins.end())
                 {
                     string channel;
@@ -224,6 +236,7 @@ void handle_client(int client_socket)
             }
             else if (command == "list")
             {
+                // List all channels and users
                 stringstream response;
                 response << "You are currently in channel: " << current_channel << "\n";
                 response << "Available channels:\n";
@@ -241,6 +254,7 @@ void handle_client(int client_socket)
         }
         else
         {
+            // Handle messages
             if (nickname.empty())
             {
                 send(client_socket, "You must set a nickname before sending messages.\n", 49, 0);
