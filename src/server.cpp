@@ -1,6 +1,7 @@
 #include <iostream>
 #include <thread>
 #include <vector>
+#include <algorithm>
 #include <cstring>
 #include <arpa/inet.h>
 #include <unistd.h>
