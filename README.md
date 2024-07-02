@@ -1,3 +1,7 @@
+# Group Members
+	Gabriel Barbosa de Oliveira - 12543415
+ 	Rogério Lopes Lübe - 10770113 
+  	Yvis Freire Silva Santos - 12608793
 # IRC Chat
 Project implementing some IRC features in C++.
 
